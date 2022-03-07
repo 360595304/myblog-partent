@@ -1,0 +1,13 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: blog
+  datasource:
+    url: jdbc:mysql://localhost:3306/myblog?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
+    username: root
+    password: su360595304
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
