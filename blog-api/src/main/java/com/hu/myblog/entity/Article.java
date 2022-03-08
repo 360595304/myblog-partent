@@ -1,6 +1,9 @@
 package com.hu.myblog.entity;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import java.util.Date;
 
 /**
  * @author suhu
@@ -44,5 +47,6 @@ public class Article {
     /**
      * 创建时间
      */
-    private Long createDate;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private Date createDate;
 }

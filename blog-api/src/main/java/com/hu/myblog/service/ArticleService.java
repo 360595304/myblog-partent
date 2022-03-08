@@ -3,8 +3,11 @@ package com.hu.myblog.service;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.hu.myblog.entity.Article;
+import com.hu.myblog.vo.ArchiveVo;
 import com.hu.myblog.vo.ArticleVo;
 import com.hu.myblog.vo.params.PageParams;
+
+import java.util.List;
 
 
 /**
@@ -14,4 +17,10 @@ import com.hu.myblog.vo.params.PageParams;
 
 public interface ArticleService extends IService<Article> {
     Page<ArticleVo> listArticle(PageParams pageParams);
+
+    List<ArticleVo> hotArticles(int limit);
+
+    List<ArticleVo> newArticles(int limit);
+
+    List<ArchiveVo> listArchives();
 }

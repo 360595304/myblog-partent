@@ -29,6 +29,12 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
         return copyList(tagList);
     }
 
+    @Override
+    public List<Tag> hotTag(int limit) {
+        List<Long> tagIds = tagMapper.hotTag(limit);
+        return tagMapper.selectBatchIds(tagIds);
+    }
+
     private List<TagVo> copyList(List<Tag> tagList) {
         List<TagVo> tagVoList = new ArrayList<>();
         tagList.forEach(tag -> {

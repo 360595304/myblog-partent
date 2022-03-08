@@ -10,4 +10,6 @@ import java.util.List;
 @Mapper
 public interface TagMapper extends BaseMapper<Tag> {
     List<Tag> findTagsByArticleId(Long id);
+
+    List<Long> hotTag(int limit);
 }
