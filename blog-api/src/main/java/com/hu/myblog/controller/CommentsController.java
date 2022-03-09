@@ -3,6 +3,7 @@ package com.hu.myblog.controller;
 import com.hu.myblog.entity.Comment;
 import com.hu.myblog.result.Result;
 import com.hu.myblog.service.CommentsService;
+import com.hu.myblog.vo.CommentVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,7 +25,7 @@ public class CommentsController {
 
     @GetMapping("/article/{id}")
     public Result comments(@PathVariable Long id) {
-        List<Comment> commentList = commentsService.getCommentsByArticleId(id);
+        List<CommentVo> commentList = commentsService.getCommentsByArticleId(id);
         return Result.ok(commentList);
     }
 }

@@ -7,9 +7,13 @@ import com.hu.myblog.entity.SysUser;
 import com.hu.myblog.mapper.CommentsMapper;
 import com.hu.myblog.service.CommentsService;
 import com.hu.myblog.service.SysUserService;
+import com.hu.myblog.vo.CommentVo;
+import com.hu.myblog.vo.SimpleUser;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -28,31 +32,50 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comment> im
 
 
     @Override
-    public List<Comment> getCommentsByArticleId(Long id) {
+    public List<CommentVo> getCommentsByArticleId(Long id) {
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getArticleId, id);
         queryWrapper.eq(Comment::getLevel, 1);
         List<Comment> commentList = commentsMapper.selectList(queryWrapper);
-        commentList.forEach(this::pack);
-        return commentList;
+        return this.copyList(commentList);
+    }
+
+    private List<CommentVo> copyList(List<Comment> commentList) {
+        List<CommentVo> commentVoList = new ArrayList<>();
+        commentList.forEach(comment -> {
+            CommentVo commentVo = this.pack(comment);
+            commentVoList.add(commentVo);
+        });
+        return commentVoList;
     }
 
     @Override
     public List<Comment> getChildrenByParentId(Long id) {
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getParentId, id);
+        queryWrapper.eq(Comment::getLevel, 2);
         queryWrapper.orderByAsc(Comment::getCreateDate);
         return commentsMapper.selectList(queryWrapper);
     }
 
-    private void pack(Comment comment) {
+    private CommentVo pack(Comment comment) {
+        CommentVo commentVo = new CommentVo();
+        BeanUtils.copyProperties(comment, commentVo);
         Long authorId = comment.getAuthorId();
         SysUser user = userService.getById(authorId);
-        comment.getParams().put("author", user.getNickname());
-        comment.getParams().put("avatar", user.getAvatar());
+        SimpleUser simpleUser = new SimpleUser();
+        BeanUtils.copyProperties(user, simpleUser);
+        commentVo.setAuthor(simpleUser);
         if (comment.getLevel() == 1) {
             List<Comment> children = this.getChildrenByParentId(comment.getId());
-            comment.getParams().put("children", children);
+            commentVo.setChildren(this.copyList(children));
         }
+        if (comment.getLevel() > 1) {
+            SysUser toUser = userService.getById(comment.getToUid());
+            SimpleUser simpleUser1 = new SimpleUser();
+            BeanUtils.copyProperties(toUser, simpleUser1);
+            commentVo.setToUser(simpleUser1);
+        }
+        return commentVo;
     }
 }

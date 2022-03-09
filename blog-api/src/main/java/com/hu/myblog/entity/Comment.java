@@ -32,6 +32,4 @@ public class Comment {
 
     private Integer level;
 
-    @TableField(exist = false)
-    private Map<String, Object> params = new HashMap<>();
 }
