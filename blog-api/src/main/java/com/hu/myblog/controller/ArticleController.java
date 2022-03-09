@@ -25,12 +25,14 @@ public class ArticleController {
     @Autowired
     private ArticleService articleService;
 
+    //文章列表
     @PostMapping("/")
     public Result listArticle(@RequestBody PageParams pageParams) {
         Page<ArticleVo> articleList = articleService.listArticle(pageParams);
         return Result.ok(articleList);
     }
 
+    // 最热文章
     @GetMapping("/hot")
     public Result hotArticles() {
         int limit = 5;
@@ -38,6 +40,7 @@ public class ArticleController {
         return Result.ok(articleList);
     }
 
+    // 最新文章
     @GetMapping("/new")
     public Result newArticles() {
         int limit = 5;
@@ -45,10 +48,19 @@ public class ArticleController {
         return Result.ok(articleList);
     }
 
+
+    // 按年月归档
     @GetMapping("/archives")
     public Result listArchives() {
         List<ArchiveVo> articleList = articleService.listArchives();
         return Result.ok(articleList);
+    }
+
+    // 根据id查询文章
+    @GetMapping("/view/{id}")
+    public Result findArticleById(@PathVariable long id) {
+        ArticleVo articleVo = articleService.findArticleVoById(id);
+        return Result.ok(articleVo);
     }
 
 }

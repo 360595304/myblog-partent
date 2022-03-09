@@ -13,5 +13,5 @@ public class ArchiveVo {
 
     private String month;
 
-    private int count;
+    private Integer count;
 }

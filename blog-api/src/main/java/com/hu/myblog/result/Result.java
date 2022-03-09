@@ -29,4 +29,14 @@ public class Result {
     public static Result fail(int code, String msg) {
         return new Result(false, code, msg, null);
     }
+
+    public static Result fail(ErrorCode errorCode) {
+        return new Result(false, errorCode.getCode(), errorCode.getMsg(), null);
+    }
+
+    public Result message(String msg) {
+        this.setMsg(msg);
+        return this;
+    }
+
 }

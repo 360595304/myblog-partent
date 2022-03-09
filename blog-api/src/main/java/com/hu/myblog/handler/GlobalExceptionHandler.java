@@ -18,4 +18,11 @@ public class GlobalExceptionHandler {
         e.printStackTrace();
         return Result.fail(-999, "系统异常");
     }
+
+    @ExceptionHandler(MyException.class)
+    @ResponseBody
+    public Result myExceptionHandler(MyException e) {
+        e.printStackTrace();
+        return Result.fail(e.getCode(), e.getMsg());
+    }
 }

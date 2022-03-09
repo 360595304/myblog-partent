@@ -23,4 +23,6 @@ public interface ArticleService extends IService<Article> {
     List<ArticleVo> newArticles(int limit);
 
     List<ArchiveVo> listArchives();
+
+    ArticleVo findArticleVoById(long id);
 }

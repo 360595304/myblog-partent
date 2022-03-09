@@ -7,7 +7,13 @@ spring:
     url: jdbc:mysql://localhost:3306/myblog?characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai
     username: root
     password: su360595304
-
+  redis:
+    host: 192.168.227.134
+    database: 0
+    port: 6379
+  jackson:
+    time-zone: GMT+8
+    date-format: yyyy-MM-dd HH:mm
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
