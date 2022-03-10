@@ -1,6 +1,7 @@
 package com.hu.myblog.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.hu.myblog.common.aop.LogAnnotation;
 import com.hu.myblog.result.Result;
 import com.hu.myblog.service.ArticleService;
 import com.hu.myblog.vo.ArchiveVo;
@@ -28,6 +29,7 @@ public class ArticleController {
 
     //文章列表
     @PostMapping("")
+    @LogAnnotation(module = "文章", operator = "获取文章列表")
     public Result listArticle(@RequestBody PageParams pageParams) {
         Page<ArticleVo> articleList = articleService.listArticle(pageParams);
         return Result.ok(articleList);
