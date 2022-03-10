@@ -22,11 +22,16 @@ public class TagController {
     @Autowired
     private TagService tagService;
 
+    @GetMapping("/getAll")
+    public Result getAll() {
+        List<TagVo> tagVoList = tagService.findAllTagVo();
+        return Result.ok(tagVoList);
+    }
+
     @GetMapping("/hot")
     public Result hotTag() {
         int limit = 6;
         List<Tag> tagList = tagService.hotTag(limit);
-
         return Result.ok(tagList);
     }
 }

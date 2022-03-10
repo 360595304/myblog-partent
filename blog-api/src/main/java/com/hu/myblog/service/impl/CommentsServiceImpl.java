@@ -5,15 +5,19 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hu.myblog.entity.Comment;
 import com.hu.myblog.entity.SysUser;
 import com.hu.myblog.mapper.CommentsMapper;
+import com.hu.myblog.service.ArticleService;
 import com.hu.myblog.service.CommentsService;
 import com.hu.myblog.service.SysUserService;
+import com.hu.myblog.utils.UserThreadLocal;
 import com.hu.myblog.vo.CommentVo;
 import com.hu.myblog.vo.SimpleUser;
+import com.hu.myblog.vo.params.CommentParams;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -30,12 +34,15 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comment> im
     @Autowired
     private SysUserService userService;
 
+    @Autowired
+    private ArticleService articleService;
 
     @Override
     public List<CommentVo> getCommentsByArticleId(Long id) {
         LambdaQueryWrapper<Comment> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(Comment::getArticleId, id);
         queryWrapper.eq(Comment::getLevel, 1);
+        queryWrapper.orderByAsc(Comment::getCreateDate);
         List<Comment> commentList = commentsMapper.selectList(queryWrapper);
         return this.copyList(commentList);
     }
@@ -56,6 +63,28 @@ public class CommentsServiceImpl extends ServiceImpl<CommentsMapper, Comment> im
         queryWrapper.eq(Comment::getLevel, 2);
         queryWrapper.orderByAsc(Comment::getCreateDate);
         return commentsMapper.selectList(queryWrapper);
+    }
+
+    @Override
+    public void saveComment(CommentParams commentParams) {
+        SysUser user = UserThreadLocal.get();
+        Comment comment = new Comment();
+        comment.setContent(commentParams.getContent());
+        Long articleId = commentParams.getArticleId();
+        comment.setArticleId(articleId);
+        comment.setAuthorId(user.getId());
+        comment.setCreateDate(new Date());
+        Long parent = commentParams.getParent();
+        if (parent == null || parent == 0) {
+            comment.setLevel(1);
+        } else {
+            comment.setLevel(2);
+        }
+        comment.setParentId(parent == null ? 0 : parent);
+        Long toUserId = commentParams.getToUserId();
+        comment.setToUid(toUserId == null ? 0 : toUserId);
+        articleService.addCommentCounts(articleId);
+        commentsMapper.insert(comment);
     }
 
     private CommentVo pack(Comment comment) {

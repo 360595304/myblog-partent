@@ -22,7 +22,7 @@ public class Comment {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm")
     private Date createDate;
 
-    private Integer articleId;
+    private Long articleId;
 
     private Long authorId;
 

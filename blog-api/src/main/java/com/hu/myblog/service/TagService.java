@@ -10,4 +10,6 @@ public interface TagService extends IService<Tag> {
     List<TagVo> findTagsByArticleId(Long id);
 
     List<Tag> hotTag(int limit);
+
+    List<TagVo> findAllTagVo();
 }

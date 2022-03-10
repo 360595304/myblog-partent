@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.hu.myblog.entity.Article;
 import com.hu.myblog.vo.ArchiveVo;
 import com.hu.myblog.vo.ArticleVo;
+import com.hu.myblog.vo.params.ArticleParams;
 import com.hu.myblog.vo.params.PageParams;
 
 import java.util.List;
@@ -25,4 +26,8 @@ public interface ArticleService extends IService<Article> {
     List<ArchiveVo> listArchives();
 
     ArticleVo findArticleVoById(long id);
+
+    Long publish(ArticleParams articleParams);
+
+    void addCommentCounts(Long articleId);
 }

@@ -6,6 +6,7 @@ public enum ErrorCode {
     TOKEN_ERROR(10003, "TOKEN不合法"),
     USER_EXIST(10004, "用户已存在"),
     NO_PERMISSION(70001, "没有权限"),
+    ARTICLE_NOT_FOUND(70002, "没有找到该文章"),
     SESSION_TIMEOUT(90001, "会话超时"),
     NO_LOGIN(90002, "未登录"),
     ;

@@ -14,4 +14,6 @@ import java.util.List;
 @Mapper
 public interface ArticleMapper extends BaseMapper<Article> {
     List<ArchiveVo> listArchives();
+
+    void addCommentCounts(Long articleId);
 }

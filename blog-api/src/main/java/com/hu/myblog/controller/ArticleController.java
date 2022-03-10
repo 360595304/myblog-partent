@@ -1,17 +1,18 @@
 package com.hu.myblog.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.hu.myblog.entity.Article;
 import com.hu.myblog.result.Result;
 import com.hu.myblog.service.ArticleService;
 import com.hu.myblog.vo.ArchiveVo;
 import com.hu.myblog.vo.ArticleVo;
+import com.hu.myblog.vo.params.ArticleParams;
 import com.hu.myblog.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.BufferedReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 /**
@@ -26,7 +27,7 @@ public class ArticleController {
     private ArticleService articleService;
 
     //文章列表
-    @PostMapping("/")
+    @PostMapping("")
     public Result listArticle(@RequestBody PageParams pageParams) {
         Page<ArticleVo> articleList = articleService.listArticle(pageParams);
         return Result.ok(articleList);
@@ -50,7 +51,7 @@ public class ArticleController {
 
 
     // 按年月归档
-    @GetMapping("/archives")
+    @GetMapping("/listArchives")
     public Result listArchives() {
         List<ArchiveVo> articleList = articleService.listArchives();
         return Result.ok(articleList);
@@ -61,6 +62,16 @@ public class ArticleController {
     public Result findArticleById(@PathVariable long id) {
         ArticleVo articleVo = articleService.findArticleVoById(id);
         return Result.ok(articleVo);
+    }
+
+    // 发布文章
+    @PostMapping("/auth/publish")
+    public Result publishArticle(@RequestBody ArticleParams articleParams) {
+        Long id = articleService.publish(articleParams);
+        Map<String, Object> result = new HashMap<String, Object>(){{
+            put("id", id);
+        }};
+        return Result.ok(result);
     }
 
 }

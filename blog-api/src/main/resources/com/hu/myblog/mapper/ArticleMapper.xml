@@ -3,6 +3,9 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hu.myblog.mapper.ArticleMapper">
+    <update id="addCommentCounts">
+        update article set comment_counts = comment_counts+1 where id=#{articleId}
+    </update>
 
     <select id="listArchives" resultType="com.hu.myblog.vo.ArchiveVo">
         select year(create_date) as `year`, month(create_date) as `month`, count(*) as `count`
