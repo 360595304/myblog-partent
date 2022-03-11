@@ -5,6 +5,7 @@ public enum ErrorCode {
     USERNAME_PASSWORD_ERROR(10002, "用户名或密码错误"),
     TOKEN_ERROR(10003, "TOKEN不合法"),
     USER_EXIST(10004, "用户已存在"),
+    UPLOAD_ERROR(20001, "文件上传失败"),
     NO_PERMISSION(70001, "没有权限"),
     ARTICLE_NOT_FOUND(70002, "没有找到该文章"),
     SESSION_TIMEOUT(90001, "会话超时"),

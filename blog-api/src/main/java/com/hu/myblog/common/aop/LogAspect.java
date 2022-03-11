@@ -25,7 +25,7 @@ public class LogAspect {
 
     // 切入点
     @Pointcut("@annotation(com.hu.myblog.common.aop.LogAnnotation)")
-    public void pt(){};
+    public void pt(){}
 
     // 环绕通知
     @Around("pt()")

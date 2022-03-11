@@ -14,8 +14,18 @@ spring:
   jackson:
     time-zone: GMT+8
     date-format: yyyy-MM-dd HH:mm
+  servlet:
+    multipart:
+      max-file-size: 10MB
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   type-aliases-package: com.hu.myblog.entity
+
+aliyun:
+  oss:
+    endpoint: oss-cn-shanghai.aliyuncs.com
+    bucket: yyz-blog
+    accessKeyId: LTAI5tPnupkDZSa1kLMGzefA
+    secret: fh5EjM3jGIlAmmVROqwQ2C2bl31M3u
 

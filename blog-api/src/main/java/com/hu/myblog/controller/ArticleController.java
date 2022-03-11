@@ -71,7 +71,7 @@ public class ArticleController {
     public Result publishArticle(@RequestBody ArticleParams articleParams) {
         Long id = articleService.publish(articleParams);
         Map<String, Object> result = new HashMap<String, Object>(){{
-            put("id", id);
+            put("id", id.toString());
         }};
         return Result.ok(result);
     }
