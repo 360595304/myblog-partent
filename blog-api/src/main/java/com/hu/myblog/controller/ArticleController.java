@@ -9,6 +9,7 @@ import com.hu.myblog.vo.ArticleVo;
 import com.hu.myblog.vo.params.ArticleParams;
 import com.hu.myblog.vo.params.PageParams;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;

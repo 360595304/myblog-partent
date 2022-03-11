@@ -1,5 +1,6 @@
 package com.hu.myblog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.hu.myblog.entity.Category;
 import com.hu.myblog.mapper.CategoryMapper;
@@ -23,8 +24,24 @@ public class CategoryServiceImpl extends ServiceImpl<CategoryMapper, Category> i
 
     @Override
     public List<CategoryVo> getCategoriesVo() {
+        LambdaQueryWrapper<Category> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Category::getId, Category::getCategoryName);
+        List<Category> categories = categoryMapper.selectList(queryWrapper);
+        return copyList(categories);
+    }
+
+    @Override
+    public List<CategoryVo> getCategoriesVoDetail() {
         List<Category> categories = categoryMapper.selectList(null);
         return copyList(categories);
+    }
+
+    @Override
+    public CategoryVo getCategoryDetailById(Long id) {
+        Category category = categoryMapper.selectById(id);
+        CategoryVo categoryVo = new CategoryVo();
+        BeanUtils.copyProperties(category, categoryVo);
+        return categoryVo;
     }
 
     private List<CategoryVo> copyList(List<Category> categories) {

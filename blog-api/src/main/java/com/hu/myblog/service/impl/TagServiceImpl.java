@@ -1,5 +1,6 @@
 package com.hu.myblog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.hu.myblog.entity.Tag;
@@ -37,8 +38,24 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
     @Override
     public List<TagVo> findAllTagVo() {
+        LambdaQueryWrapper<Tag> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.select(Tag::getId, Tag::getTagName);
+        List<Tag> tagList = tagMapper.selectList(queryWrapper);
+        return copyList(tagList);
+    }
+
+    @Override
+    public List<TagVo> findAllTagVoDetail() {
         List<Tag> tagList = tagMapper.selectList(null);
         return copyList(tagList);
+    }
+
+    @Override
+    public TagVo getDetailById(Long id) {
+        Tag tag = tagMapper.selectById(id);
+        TagVo tagVo = new TagVo();
+        BeanUtils.copyProperties(tag, tagVo);
+        return tagVo;
     }
 
     private List<TagVo> copyList(List<Tag> tagList) {

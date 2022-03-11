@@ -9,4 +9,8 @@ import java.util.List;
 public interface CategoryService extends IService<Category> {
     // 获取所有分类
     List<CategoryVo> getCategoriesVo();
+
+    List<CategoryVo> getCategoriesVoDetail();
+
+    CategoryVo getCategoryDetailById(Long id);
 }

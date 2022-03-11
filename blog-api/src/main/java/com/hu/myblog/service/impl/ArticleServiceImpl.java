@@ -14,6 +14,7 @@ import com.hu.myblog.vo.params.ArticleParams;
 import com.hu.myblog.vo.params.PageParams;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,9 +48,27 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
 
     @Override
+    @Cacheable(value = "article", keyGenerator = "keyGenerator")
     public Page<ArticleVo> listArticle(PageParams pageParams) {
         Page<Article> page = new Page<>(pageParams.getPage(), pageParams.getPageSize());
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+        if (pageParams.getCategoryId() != null) {
+            queryWrapper.eq("category_id", pageParams.getCategoryId());
+        }
+        if (pageParams.getTagId() != null) {
+            List<ArticleTag> articleTagList = articleTagService.findByTagId(pageParams.getTagId());
+            List<Long> articleIds = new ArrayList<>();
+            for (ArticleTag articleTag : articleTagList) {
+                articleIds.add(articleTag.getArticleId());
+            }
+            queryWrapper.in("id", articleIds);
+        }
+        if (pageParams.getYear() != null) {
+            queryWrapper.eq("year(create_date)", pageParams.getYear());
+        }
+        if (pageParams.getMonth() != null) {
+            queryWrapper.eq("month(create_date)", pageParams.getMonth());
+        }
         queryWrapper.orderByDesc("weight", "create_date");
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
         List<ArticleVo> articleVoList = this.copyList(articlePage.getRecords(), true, true);
@@ -57,10 +76,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleVoPage.setRecords(articleVoList);
         articleVoPage.setPages(page.getPages());
         articleVoPage.setTotal(page.getTotal());
+        articleVoPage.setSize(pageParams.getPageSize());
         return articleVoPage;
     }
 
     @Override
+    @Cacheable(value = "article", keyGenerator = "keyGenerator")
     public List<ArticleVo> hotArticles(int limit) {
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "title")
@@ -70,6 +91,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    @Cacheable(value = "article", keyGenerator = "keyGenerator")
     public List<ArticleVo> newArticles(int limit) {
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "title")
