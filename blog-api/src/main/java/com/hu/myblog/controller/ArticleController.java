@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.ResultSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +76,26 @@ public class ArticleController {
             put("id", id.toString());
         }};
         return Result.ok(result);
+    }
+
+    // 发布文章
+    @GetMapping("/auth/userArticle/{page}/{size}")
+    public Result userArticle(@PathVariable Integer page,
+                              @PathVariable Integer size) {
+        Page<ArticleVo> articleList = articleService.listArticleByUserId(page, size);
+        return Result.ok(articleList);
+    }
+
+    @GetMapping("/{id}")
+    public Result getArticleById(@PathVariable Long id) {
+        ArticleVo articleVo = articleService.findArticleVoById(id);
+        return Result.ok(articleVo);
+    }
+
+    @DeleteMapping("/auth/delete/{id}")
+    public Result deleteArticle(@PathVariable Long id) {
+        articleService.removeArticleById(id);
+        return Result.ok();
     }
 
 }

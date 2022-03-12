@@ -49,4 +49,8 @@ public class Article {
      */
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createDate;
+
+    private Integer onShow;
+
+    private Integer published;
 }

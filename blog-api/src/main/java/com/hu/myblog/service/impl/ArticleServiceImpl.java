@@ -1,5 +1,6 @@
 package com.hu.myblog.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -14,13 +15,16 @@ import com.hu.myblog.vo.params.ArticleParams;
 import com.hu.myblog.vo.params.PageParams;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @author suhu
@@ -46,6 +50,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @Autowired
     private ArticleTagService articleTagService;
 
+    @Autowired
+    private CommentsService commentsService;
 
     @Override
     @Cacheable(value = "article", keyGenerator = "keyGenerator")
@@ -112,7 +118,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public ArticleVo findArticleVoById(long id) {
         Article article = articleMapper.selectById(id);
         if (article == null) {
-            throw new MyException(ErrorCode.TOKEN_ERROR);
+            throw new MyException(ErrorCode.ARTICLE_NOT_FOUND);
         }
         threadService.updateArticleViewCount(articleMapper, article);
         return this.copy(article, true, true, true, true);
@@ -120,7 +126,32 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
 
     @Override
     @Transactional
+    @CacheEvict(value = "article", allEntries = true)
     public Long publish(ArticleParams articleParams) {
+        // 修改
+        if (!StringUtils.isEmpty(articleParams.getId())){
+            Article article = articleMapper.selectById(articleParams.getId());
+            article.setTitle(articleParams.getTitle());
+            article.setSummary(articleParams.getSummary());
+            article.setCategoryId(articleParams.getCategory().getId());
+            articleMapper.updateById(article);
+            ArticleBody articleBody = articleBodyService.getById(article.getBodyId());
+            articleBody.setContent(articleParams.getBody().getContent());
+            articleBody.setContentBody(articleParams.getBody().getHtmlContent());
+            articleBodyService.updateById(articleBody);
+            List<TagVo> tags = articleParams.getTags();
+            LambdaQueryWrapper<ArticleTag> queryWrapper = new LambdaQueryWrapper<>();
+            queryWrapper.eq(ArticleTag::getArticleId, article.getId());
+            articleTagService.remove(queryWrapper);
+            for (TagVo tag : tags) {
+                ArticleTag articleTag = new ArticleTag();
+                articleTag.setArticleId(article.getId());
+                articleTag.setTagId(tag.getId());
+                articleTagService.save(articleTag);
+            }
+            return articleParams.getId();
+        }
+        // 新增
         SysUser user = UserThreadLocal.get();
         Article article = new Article();
         article.setCommentCounts(Article.Article_Common);
@@ -162,6 +193,51 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         articleMapper.addCommentCounts(articleId);
     }
 
+    @Override
+    public Page<ArticleVo> listArticleByUserId(Integer page, Integer size) {
+        Page<Article> articlePage = new Page<>(page, size);
+        QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
+        SysUser user = UserThreadLocal.get();
+        queryWrapper.eq("author_id", user.getId());
+        queryWrapper.orderByDesc("create_date");
+        Page<Article> articles = articleMapper.selectPage(articlePage, queryWrapper);
+        List<ArticleVo> articleVoList = this.copyList(articlePage.getRecords(), true, true);
+        Page<ArticleVo> articleVoPage = new Page<>(page, size);
+        articleVoPage.setRecords(articleVoList);
+        articleVoPage.setPages(articles.getPages());
+        articleVoPage.setTotal(articles.getTotal());
+        articleVoPage.setSize(size);
+        return articleVoPage;
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = "article", allEntries = true)
+    public void removeArticleById(Long id) {
+        SysUser user = UserThreadLocal.get();
+        Article article = articleMapper.selectById(id);
+        if (article == null) {
+            throw new MyException(ErrorCode.ARTICLE_NOT_FOUND);
+        }
+        if (!Objects.equals(article.getAuthorId(), user.getId()) && user.getId() != 1) {
+            throw new MyException(ErrorCode.NO_PERMISSION);
+        }
+        // 删除文章body
+        LambdaQueryWrapper<ArticleBody> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.eq(ArticleBody::getArticleId, id);
+        articleBodyService.remove(queryWrapper);
+        // 删除文章关联的标签记录
+        LambdaQueryWrapper<ArticleTag> articleTagLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        articleTagLambdaQueryWrapper.eq(ArticleTag::getArticleId, id);
+        articleTagService.remove(articleTagLambdaQueryWrapper);
+        // 删除相关评论
+        LambdaQueryWrapper<Comment> commentLambdaQueryWrapper = new LambdaQueryWrapper<>();
+        commentLambdaQueryWrapper.eq(Comment::getArticleId, id);
+        commentsService.remove(commentLambdaQueryWrapper);
+        // 删除文章
+        articleMapper.deleteById(id);
+    }
+
     // 转换成vo
     private List<ArticleVo> copyList(List<Article> articleList, boolean isTag, boolean isAuthor) {
         List<ArticleVo> articleVoList = new ArrayList<>();
@@ -179,7 +255,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         }
         if (isAuthor) {
             Long authorId = article.getAuthorId();
-            articleVo.setAuthor(sysUserService.getById(authorId).getNickname());
+            SysUser user = sysUserService.getById(authorId);
+            articleVo.setAuthor(user.getNickname());
+            articleVo.setAvatar(user.getAvatar());
         }
         if (isBody) {
             ArticleBody articleBody = articleBodyService.getById(article.getBodyId());

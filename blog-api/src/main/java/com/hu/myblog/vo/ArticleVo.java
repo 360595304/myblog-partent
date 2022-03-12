@@ -1,6 +1,6 @@
 package com.hu.myblog.vo;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
@@ -19,6 +19,8 @@ public class ArticleVo {
 
     private String title;
 
+    private String avatar;
+
     private String summary;
 
     private Integer commentCounts;
@@ -29,8 +31,11 @@ public class ArticleVo {
     /**
      * 创建时间
      */
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    @JSONField(format = "yyyy-MM-dd HH:mm")
     private Date createDate;
+
+    @JsonSerialize(using = ToStringSerializer.class)
+    private Long authorId;
 
     private String author;
 

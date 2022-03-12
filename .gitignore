@@ -1,3 +1,4 @@
 # 项目排除路径
 /blog-api/target/
 /blog-api/src/main/resources/*.yml
+/blog-admin/src/main/resources/*.yml

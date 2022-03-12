@@ -30,4 +30,8 @@ public interface ArticleService extends IService<Article> {
     Long publish(ArticleParams articleParams);
 
     void addCommentCounts(Long articleId);
+
+    Page<ArticleVo> listArticleByUserId(Integer page, Integer size);
+
+    void removeArticleById(Long id);
 }

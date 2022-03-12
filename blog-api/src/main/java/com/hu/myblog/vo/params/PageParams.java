@@ -10,7 +10,7 @@ import lombok.Data;
 public class PageParams {
     private int page = 1;
 
-    private int pageSize = 10;
+    private int pageSize = 5;
 
     private Long categoryId;
 
