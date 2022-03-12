@@ -24,8 +24,8 @@ mybatis-plus:
 
 aliyun:
   oss:
-    endpoint: oss-cn-shanghai.aliyuncs.com
-    bucket: yyz-blog
-    accessKeyId: LTAI5tPnupkDZSa1kLMGzefA
-    secret: fh5EjM3jGIlAmmVROqwQ2C2bl31M3u
+    endpoint: oss-cn-xxx.aliyuncs.com
+    bucket: xxx
+    accessKeyId: xxx
+    secret: xxx
 
