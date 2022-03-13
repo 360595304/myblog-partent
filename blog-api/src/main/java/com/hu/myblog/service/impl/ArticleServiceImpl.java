@@ -130,15 +130,23 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public Long publish(ArticleParams articleParams) {
         // 修改
         if (!StringUtils.isEmpty(articleParams.getId())){
+            // 修改文章信息
             Article article = articleMapper.selectById(articleParams.getId());
+            // 验证权限
+            Long userId = UserThreadLocal.get().getId();
+            if (!Objects.equals(userId, article.getAuthorId()) && userId != 1L){
+                throw new MyException(ErrorCode.NO_PERMISSION);
+            }
             article.setTitle(articleParams.getTitle());
             article.setSummary(articleParams.getSummary());
             article.setCategoryId(articleParams.getCategory().getId());
             articleMapper.updateById(article);
+            // 修改文章内容
             ArticleBody articleBody = articleBodyService.getById(article.getBodyId());
             articleBody.setContent(articleParams.getBody().getContent());
-            articleBody.setContentBody(articleParams.getBody().getHtmlContent());
+            articleBody.setContentBody(articleParams.getBody().getContentHtml());
             articleBodyService.updateById(articleBody);
+            // 修改标签（删除旧标签，设置新标签）
             List<TagVo> tags = articleParams.getTags();
             LambdaQueryWrapper<ArticleTag> queryWrapper = new LambdaQueryWrapper<>();
             queryWrapper.eq(ArticleTag::getArticleId, article.getId());
@@ -181,7 +189,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         ArticleBody articleBody = new ArticleBody();
         articleBody.setArticleId(articleId);
         articleBody.setContent(articleParams.getBody().getContent());
-        articleBody.setContentBody(articleParams.getBody().getHtmlContent());
+        articleBody.setContentBody(articleParams.getBody().getContentHtml());
         articleBodyService.save(articleBody);
         article.setBodyId(articleBody.getId());
         articleMapper.updateById(article);
@@ -216,9 +224,11 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public void removeArticleById(Long id) {
         SysUser user = UserThreadLocal.get();
         Article article = articleMapper.selectById(id);
+        // 判断文章是否存在
         if (article == null) {
             throw new MyException(ErrorCode.ARTICLE_NOT_FOUND);
         }
+        // 只有文章作者和超级管理员能删除
         if (!Objects.equals(article.getAuthorId(), user.getId()) && user.getId() != 1) {
             throw new MyException(ErrorCode.NO_PERMISSION);
         }

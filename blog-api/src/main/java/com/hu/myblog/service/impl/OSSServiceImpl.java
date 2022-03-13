@@ -21,7 +21,7 @@ import java.util.UUID;
 @Service
 public class OSSServiceImpl implements OSSService {
     @Override
-    public String uploadFile(MultipartFile file) {
+    public String uploadFile(MultipartFile file, String path) {
         // Endpoint以Region请按实际情况填写。
         String endpoint = ConstantOssPropertiesUtil.ENDPOINT;
         // 阿里云账号AccessKey拥有所有API的访问权限，风险很高。强烈建议您创建并使用RAM用户进行API访问或日常运维，请登录RAM控制台创建RAM用户。
@@ -37,8 +37,7 @@ public class OSSServiceImpl implements OSSService {
             InputStream inputStream = file.getInputStream();
             String fileName = StringUtils.substringAfterLast(file.getOriginalFilename(), ".");
             String uuid = UUID.randomUUID().toString().replaceAll("-", "");
-            String date = new DateTime().toString("yyyy/MM/dd");
-            fileName = date + "/" + uuid + "." + fileName;
+            fileName = path + "/" + uuid + "." + fileName;
             // 创建PutObject请求。
             ossClient.putObject(bucketName, fileName, inputStream);
             return "http://static.yyzblog.top/" + fileName;

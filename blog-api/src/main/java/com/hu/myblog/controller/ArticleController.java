@@ -78,7 +78,7 @@ public class ArticleController {
         return Result.ok(result);
     }
 
-    // 发布文章
+    // 用户文章
     @GetMapping("/auth/userArticle/{page}/{size}")
     public Result userArticle(@PathVariable Integer page,
                               @PathVariable Integer size) {
@@ -92,7 +92,7 @@ public class ArticleController {
         return Result.ok(articleVo);
     }
 
-    @DeleteMapping("/auth/delete/{id}")
+    @PostMapping("/auth/delete/{id}")
     public Result deleteArticle(@PathVariable Long id) {
         articleService.removeArticleById(id);
         return Result.ok();

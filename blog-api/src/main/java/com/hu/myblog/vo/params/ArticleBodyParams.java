@@ -10,5 +10,5 @@ import lombok.Data;
 public class ArticleBodyParams {
     private String content;
 
-    private String htmlContent;
+    private String contentHtml;
 }

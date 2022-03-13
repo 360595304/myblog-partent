@@ -2,17 +2,18 @@ package com.hu.myblog.controller;
 
 import com.fasterxml.jackson.databind.util.BeanUtil;
 import com.hu.myblog.entity.SysUser;
+import com.hu.myblog.handler.MyException;
 import com.hu.myblog.result.ErrorCode;
 import com.hu.myblog.result.Result;
 import com.hu.myblog.service.SysUserService;
 import com.hu.myblog.utils.UserThreadLocal;
 import com.hu.myblog.vo.UserVo;
+import com.hu.myblog.vo.params.UserParams;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 /**
@@ -41,6 +42,24 @@ public class UserController {
     public Result test() {
         SysUser user = UserThreadLocal.get();
         System.out.println(user);
+        return Result.ok();
+    }
+
+    @PostMapping("/auth/update")
+    public Result update(@RequestHeader("Authorization") String token,
+                         @RequestBody UserParams userParams) {
+        userService.updateUser(userParams);
+        userService.updateToken(token);
+        return Result.ok();
+    }
+
+    @PostMapping("/auth/head")
+    public Result updateHead(@RequestHeader("Authorization") String token, MultipartFile file) {
+        String path = userService.updateHead(file);
+        if (StringUtils.isEmpty(path)) {
+            throw new MyException(ErrorCode.UPLOAD_ERROR);
+        }
+        userService.updateToken(token);
         return Result.ok();
     }
 }
