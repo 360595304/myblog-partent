@@ -7,5 +7,5 @@ import org.springframework.web.multipart.MultipartFile;
  * @createDate 2022/3/11
  */
 public interface OSSService {
-    String uploadFile(MultipartFile file);
+    String uploadFile(MultipartFile file, String path);
 }

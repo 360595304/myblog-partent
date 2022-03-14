@@ -51,12 +51,12 @@
                 </el-table-column>
                 <el-table-column label="类别" align="center" :width="'130px'">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="primary"  round plain>{{scope.row.params.categoryName}}</el-button>
+                        <el-tag size="mini" type="success"  round plain>{{scope.row.params.categoryName}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="标签" align="center">
                     <template slot-scope="scope">
-                        <el-button size="mini" type="primary"  round plain v-for="tag in scope.row.params.tags">{{tag}}</el-button>
+                        <el-tag size="mini" type="info"  round plain v-for="tag in scope.row.params.tags">{{tag}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="发布时间" align="center" prop="createDate">
