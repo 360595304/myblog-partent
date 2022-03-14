@@ -59,8 +59,8 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (!StringUtils.isEmpty(articleParam.getShow())) {
             queryWrapper.eq(Article::getOnShow, articleParam.getShow());
         }
-        if (!StringUtils.isEmpty(articleParam.getCreatedDate())) {
-            queryWrapper.ge(Article::getCreateDate, articleParam.getCreatedDate());
+        if (!StringUtils.isEmpty(articleParam.getCreateDate())) {
+            queryWrapper.ge(Article::getCreateDate, articleParam.getCreateDate());
         }
         queryWrapper.orderByDesc(Article::getCreateDate);
         queryWrapper.eq(Article::getPublished, 0);

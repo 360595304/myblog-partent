@@ -58,7 +58,7 @@ public class RedisConfig {
 
         // 配置序列化（解决乱码的问题）,过期时间5分钟
         RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofSeconds(5 * 60 * 1000))
+                .entryTtl(Duration.ofSeconds(5 * 60))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(redisSerializer))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
                 .disableCachingNullValues();

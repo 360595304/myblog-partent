@@ -2,6 +2,8 @@ package com.hu.myblog.admin.entity;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.Data;
 
 import java.util.Date;
@@ -18,6 +20,7 @@ public class Article {
 
     public static final Integer Article_Common = 0;
 
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long id;
 
     private String title;
@@ -31,14 +34,17 @@ public class Article {
     /**
      * 作者id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long authorId;
     /**
      * 内容id
      */
+    @JsonSerialize(using = ToStringSerializer.class)
     private Long bodyId;
     /**
      *类别id
      */
+
     private Long categoryId;
 
     /**

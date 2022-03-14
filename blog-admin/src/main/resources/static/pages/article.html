@@ -37,40 +37,67 @@
     <div class="app-container">
         <div class="box">
             <div class="filter-container">
-                <el-input placeholder="用户名称" v-model="pagination.queryString" style="width: 200px;"
+                <el-input placeholder="标题" v-model="pagination.title" style="width: 200px;"
                           class="filter-item"></el-input>
+                <el-date-picker
+                        v-model="pagination.createDate"
+                        value-format="yyyy-MM-dd HH:mm:ss"
+                        type="datetime"
+                        placeholder="选择日期时间">
+                </el-date-picker>
                 <el-button @click="findSearchPage()" class="dalfBut">查询</el-button>
                 <!--                <el-button type="primary" class="butT" @click="handleCreate()">新建</el-button>-->
             </div>
             <el-table size="small" current-row-key="id" :data="dataList" stripe highlight-current-row border>
                 <el-table-column align="center" label="序号" type="index" :index="index">
                 </el-table-column>
-                <el-table-column label="标题" align="center" prop="title" >
+                <el-table-column label="标题" align="center" prop="title">
                 </el-table-column>
                 <el-table-column label="作者" align="center" prop="params.authorName" :width="'100px'">
                 </el-table-column>
                 <el-table-column label="类别" align="center" :width="'130px'">
                     <template slot-scope="scope">
-                        <el-tag size="mini" type="success"  round plain>{{scope.row.params.categoryName}}</el-tag>
+                        <el-tag size="mini" type="success" round plain>{{scope.row.params.categoryName}}</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="标签" align="center">
                     <template slot-scope="scope">
-                        <el-tag size="mini" type="info"  round plain v-for="tag in scope.row.params.tags">{{tag}}</el-tag>
+                        <el-tag size="mini" type="info" round plain v-for="tag in scope.row.params.tags">{{tag}}
+                        </el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column label="发布时间" align="center" prop="createDate">
                 </el-table-column>
                 <el-table-column label="置顶" align="center" prop="weight" :width="'100px'">
-                </el-table-column>
-                <el-table-column label="展示" align="center" prop="onShow" :width="'100px'">
-                </el-table-column>
-                <el-table-column label="操作" align="center" fixed="right">
                     <template slot-scope="scope">
-                        <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>
-                        <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>
+                        <el-switch
+                                v-model="scope.row.weight"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949"
+                                :active-value="1"
+                                @change="weightChange(scope.row.id, scope.row.weight)"
+                                :inactive-value="0">
+                        </el-switch>
                     </template>
                 </el-table-column>
+                <el-table-column label="展示" align="center" prop="onShow" :width="'100px'">
+                    <template slot-scope="scope">
+                        <el-switch
+                                v-model="scope.row.onShow"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949"
+                                :active-value="1"
+                                @change="onShowChange(scope.row.id, scope.row.onShow)"
+                                :inactive-value="0">
+                        </el-switch>
+                    </template>
+                </el-table-column>
+                <!--                <el-table-column label="操作" align="center" fixed="right">-->
+                <!--                    <template slot-scope="scope">-->
+                <!--                        <el-button type="primary" size="mini" @click="handleUpdate(scope.row)">编辑</el-button>-->
+                <!--                        <el-button size="mini" type="danger" @click="handleDelete(scope.row)">删除</el-button>-->
+                <!--                    </template>-->
+                <!--                </el-table-column>-->
             </el-table>
             <div class="pagination-container">
                 <el-pagination
@@ -82,39 +109,7 @@
                         :total="pagination.total">
                 </el-pagination>
             </div>
-            <!-- 新增标签弹层 -->
-            <!--            <div class="add-form">-->
-            <!--                <el-dialog title="新增" :visible.sync="dialogFormVisible">-->
-            <!--                    <el-form ref="dataAddForm" :model="formData" :rules="rules" label-position="right"-->
-            <!--                             label-width="100px">-->
-            <!--                        <el-row>-->
-            <!--                            <el-col>-->
-            <!--                                <el-form-item label="名称" prop="name">-->
-            <!--                                    <el-input v-model="formData.name"/>-->
-            <!--                                </el-form-item>-->
-            <!--                            </el-col>-->
-            <!--                        </el-row>-->
-            <!--                        <el-row>-->
-            <!--                            <el-col>-->
-            <!--                                <el-form-item label="路径" prop="path">-->
-            <!--                                    <el-input v-model="formData.path"/>-->
-            <!--                                </el-form-item>-->
-            <!--                            </el-col>-->
-            <!--                        </el-row>-->
-            <!--                        <el-row>-->
-            <!--                            <el-col>-->
-            <!--                                <el-form-item label="描述" prop="description">-->
-            <!--                                    <el-input v-model="formData.description"/>-->
-            <!--                                </el-form-item>-->
-            <!--                            </el-col>-->
-            <!--                        </el-row>-->
-            <!--                    </el-form>-->
-            <!--                    <div slot="footer" class="dialog-footer">-->
-            <!--                        <el-button @click="dialogFormVisible = false">取消</el-button>-->
-            <!--                        <el-button type="primary" @click="handleAdd()">确定</el-button>-->
-            <!--                    </div>-->
-            <!--                </el-dialog>-->
-            <!--            </div>-->
+
 
             <!--            &lt;!&ndash; 编辑标签弹层 &ndash;&gt;-->
             <!--            <div class="add-form">-->
@@ -219,6 +214,24 @@
             this.findPage();
         },
         methods: {
+            onShowChange(id, onShow) {
+                axios.get(`/admin/article/onShow/${id}/${onShow}`).then(res => {
+                    if (res.status !== 200 || res.data.code !== 200) {
+                        this.$message.error("修改失败")
+                    }
+                }).catch(err=>{
+                    this.$message.error("修改失败")
+                })
+            },
+            weightChange(id, weight) {
+                axios.get(`/admin/article/weight/${id}/${weight}`).then(res => {
+                    if (res.status !== 200 || res.data.code !== 200) {
+                        this.$message.error("修改失败")
+                    }
+                }).catch(err=>{
+                    this.$message.error("修改失败")
+                })
+            },
             index(index) {
                 return index + 1 + (this.pagination.currentPage - 1) * this.pagination.pageSize
             },

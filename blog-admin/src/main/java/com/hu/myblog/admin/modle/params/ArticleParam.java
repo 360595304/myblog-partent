@@ -20,5 +20,5 @@ public class ArticleParam {
 
     private Integer show;
 
-    private Date createdDate;
+    private Date createDate;
 }

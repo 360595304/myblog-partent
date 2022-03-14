@@ -8,6 +8,7 @@ public enum ErrorCode {
     UPLOAD_ERROR(20001, "文件上传失败"),
     NO_PERMISSION(70001, "没有权限"),
     ARTICLE_NOT_FOUND(70002, "没有找到该文章"),
+    ARTICLE_LOCKED(70003, "文章被锁定"),
     SESSION_TIMEOUT(90001, "会话超时"),
     NO_LOGIN(90002, "未登录"),
     ;

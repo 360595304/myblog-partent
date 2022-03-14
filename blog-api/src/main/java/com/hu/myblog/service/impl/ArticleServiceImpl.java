@@ -75,6 +75,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         if (pageParams.getMonth() != null) {
             queryWrapper.eq("month(create_date)", pageParams.getMonth());
         }
+        queryWrapper.eq("on_show", 1);
         queryWrapper.orderByDesc("weight", "create_date");
         Page<Article> articlePage = articleMapper.selectPage(page, queryWrapper);
         List<ArticleVo> articleVoList = this.copyList(articlePage.getRecords(), true, true);
@@ -91,6 +92,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public List<ArticleVo> hotArticles(int limit) {
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "title")
+                .eq("on_show", 1)
                 .orderByDesc("view_counts").last("limit " + limit);
         List<Article> articleList = articleMapper.selectList(queryWrapper);
         return copyList(articleList, false, false);
@@ -101,6 +103,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     public List<ArticleVo> newArticles(int limit) {
         QueryWrapper<Article> queryWrapper = new QueryWrapper<>();
         queryWrapper.select("id", "title")
+                .eq("on_show", 1)
                 .orderByDesc("create_date").last("limit " + limit);
         List<Article> articleList = articleMapper.selectList(queryWrapper);
         return copyList(articleList, false, false);
@@ -119,6 +122,9 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Article article = articleMapper.selectById(id);
         if (article == null) {
             throw new MyException(ErrorCode.ARTICLE_NOT_FOUND);
+        }
+        if (article.getOnShow() == 0) {
+            throw new MyException(ErrorCode.ARTICLE_LOCKED);
         }
         threadService.updateArticleViewCount(articleMapper, article);
         return this.copy(article, true, true, true, true);
@@ -164,6 +170,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
         Article article = new Article();
         article.setCommentCounts(Article.Article_Common);
         article.setWeight(0);
+        article.setOnShow(1);
         article.setViewCounts(0);
         article.setTitle(articleParams.getTitle());
         article.setSummary(articleParams.getSummary());
