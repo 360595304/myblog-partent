@@ -67,6 +67,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
             for (ArticleTag articleTag : articleTagList) {
                 articleIds.add(articleTag.getArticleId());
             }
+            if (articleIds.size() == 0) return new Page<>(0, 0);
             queryWrapper.in("id", articleIds);
         }
         if (pageParams.getYear() != null) {
@@ -135,12 +136,12 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     @CacheEvict(value = "article", allEntries = true)
     public Long publish(ArticleParams articleParams) {
         // 修改
-        if (!StringUtils.isEmpty(articleParams.getId())){
+        if (!StringUtils.isEmpty(articleParams.getId())) {
             // 修改文章信息
             Article article = articleMapper.selectById(articleParams.getId());
             // 验证权限
             Long userId = UserThreadLocal.get().getId();
-            if (!Objects.equals(userId, article.getAuthorId()) && userId != 1L){
+            if (!Objects.equals(userId, article.getAuthorId()) && userId != 1L) {
                 throw new MyException(ErrorCode.NO_PERMISSION);
             }
             article.setTitle(articleParams.getTitle());
